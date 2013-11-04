@@ -1,0 +1,610 @@
+#+TITLE: Machine Learning (Coursera)
+
+* Introduction
+
+** Intro
+
+Examples:
+- Database mining
+- Things we can't do by hand: Autonomous helicopter, handwriting recognition, NLP, Computer Vision
+- Self-customizing programs: Amazon and Netflix recommendations
+- Understanding /human/ learning
+
+** What is machine learning?
+
+Multiple definitions possible:
+- Arthur Samuels (1959): gives computers to learn without being explicitly programmed
+  - Checkers program
+- Tom Mitchell (1998): learns from experience wrt task if performance improves with experience
+
+Notation: task $T$, performance \( P \), experience \( E \)
+
+Two big classes of ML algorithms:
+1. Supervised
+2. Unsupervised
+
+Others: Reinforcement learning, recommender systems
+
+Also important: /best practices/ in implementing ML in real world
+
+** Supervised learning
+
+*** Example: Predicting housing prices
+
+Suppose we're given data on prices and size and sq ft.  How do we predict the price of any given house?
+- Fit the line (straight or quadratic)
+
+In *supervised learning*, the right answers to many problems are given.  Also in this case a *regression* (prediction of continuous variable)
+
+*** Example: Breast cancer (malignant or benign)
+
+Suppose we have 5 examples of malignant or benign tumors, and given a specific tumor size, we want to know the category
+
+In this case is a *classification* problem: prediction of a discrete value.
+
+Binary classification using two characteristics: threshold line and finding which side of the threshold a case is.
+
+What about /infinite numbers of features/? With *support vector machines* we'll be able to deal with this.
+
+*** Summary
+
+- We know the answers to many cases
+- *Regression* and *Classification* problems
+
+** Unsupervised learning
+
+We're given a dataset, but no labels on the data; rather, the algorithm tries to find some structure (e.g., clustering)
+
+*** Example: Google news
+
+Groups news stories according to topics
+
+*** Example: DNA microarray data
+
+With many individuals, see how much certain genes are expressed; group individuals according to the type.
+
+*** Other examples
+
+- Organize computing clusters (which computers to put together)
+- Social network analysis (tight-knit groups)
+- Market segmentation (identifying different market segments with individual customer data)
+
+*** Cocktail party problem
+
+This is another type of unsupervised learning problem.
+
+Setup: 2 speakers and 2 microphones
+
+An algorithm would find that there are two different sources and separate out the two sources. Would end up separating out individual voices (due to locational differences).
+
+* Linear regression with one variable
+
+** Model representation
+
+*** Housing prices
+
+- Dataset :: Housing prices and sizes
+- Task :: Predict the price of a 1250 square feet
+
+# --
+
+This is an example of *supervised learning* (we know the right answers), and is a *regression problem* (prediction of /real-valued variable/)
+
+*** Notation
+
+- \( m \) is the /number of training examples
+- \( \mathbf{x} \) denote "input" variables
+- \( \mathbf{y} \) denote "output" variables
+- \( (x,y) \) denotes a single complete training example
+- \( (x^{(i)}, y^{(i)} \) denotes the i-th training example
+
+More notation:
+- \( h \) is the /hypothesis/, which is the output of the learning algorithm.  Moreover, \( h \) is a function: \( h : X \rightarrow Y \)
+
+*** How do we represent /h/?
+
+For this set of lectures: \( h_{\theta}(x) = \theta_0 + \theta_1 x \)
+
+** Cost function
+
+The cost function helps us define and find the /best-fit/ line.
+
+Notation:
+- \( θ \) are parameters
+
+The idea is that we choose \( \mathbf{θ} \) so that \( h_{θ}(x) \) is close to \( y \) for our training examples \( (x, y) \).
+
+More formally:
+\begin{equation}
+\min _{θ_{0}, θ_{1}} \frac{ 1 }{ 2m } \sum _{i = 1} ^{m} \left( h_{θ}(x^{(i)} - y^{(i)} \right)^2
+\end{equation}
+
+Or, more conventionally, we let \( J(θ) \) denote our cost function, and minimize the cost function over the parameter space.  This particular choice is the /squared-error function/.
+
+** Extensions to gradient descent
+
+1. For the linear regression problem, there is a "single-shot" solution that doesn't need iteration (advantages and disadvantages)
+2. Sometimes there are large numbers of features (e.g., size, number of bedrooms, num floors, age of home, and then price)
+   - Notation gets messy
+   - We'll use the notation of linear algebra to work with large numbers of features
+   - Matrices and vectors will help to solve more than linear regression problems
+
+* Linear regression with multiple variables
+
+** Multiple features
+
+*** Notation
+
+- \( n \) denotes the number of *features* (variables)
+- \( x ^{(i)} \) denotes input of /i-th/ training example
+- \( x ^{(i)} _{j} \) denotes feature \( j \) of training example \( i \)
+
+*** Hypothesis
+
+Our hypothesis now looks like this:
+
+\begin{equation*}
+h _{θ} (x) = θ ^{T} x
+\end{equation*}
+
+** Gradient desecent for Multiple variables
+
+** Feature scaling
+
+- Want to ensure that features are in approximately \( [-1,1] \) range so that GD algorithm converges more quickly.
+- Other options: *mean normalization* (subtract the mean, divide by std deviation or range)
+
+** Learning rate
+
+- "Debugging" the GD algorithm
+- How do we set \( α \)?
+
+*** Ensuring GD is working
+
+- Plot \( J(θ) \) against the number of iterations, should be going down
+  - Note: number of iterations it takes to converge can vary wildly
+  - Automatic convergence tests: an example is to see if \( J(θ) \) changes by less than \( 10 ^{-3} \).  In practice finding the threshold can be difficult
+- If \( J(θ) \) is increasing, usually means you should be using a smaller \( α \)
+- If \( J(θ) \) goes up and down, also means you should use smaller \( α \)
+- For sufficiently small \( α \), \( J \) should decrease at every step
+  - But we don't want it too small because it will go too slowly
+
+** Features and polynomial regression
+
+- Create new features according to beliefs about the data, e.g., if we have /frontage/ and /depth/ for house prices, we might use /area/ as the predictor
+- Fitting this in to our current framework is easy, just create the \( X \) matrix accordingly
+
+Some notes:
+
+- Adding polynomial terms makes feature scaling more important (since the orders of magnitude will change greatly)
+- In the polynomial case, there are many options (e.g., if we think the shape doesn't turn down like a deg-2 polynomial, might use sqrt)
+
+** Normal equation
+
+For some linear regression problems, the normal equation gives us a better way to solve.  It is an /analytical solution/ to the cost-minimization function.
+
+Let \( X \) be the /design matrix/ with \( m \) rows and \( n \) columns.
+
+The normal equation is \( θ = (X ^{T} X) ^{-1} X ^{T} y \)
+
+In octave:
+
+#+BEGIN_SRC octave
+  pinv(X'*X)*X'*y
+#+END_SRC
+
+Note: when using the normal equation, feature scaling is not necessary
+
+*** Gradient descent or normal equation?
+
+For normal equation:
+- Don't need to choose \( α \)
+- Don't need to iterate
+
+But gradient descent may be better in some cases:
+- Works with large \( n \), whereas this can be slow in normal equation, since inverting \( X' X \) can be very slow (in most implementations, inversion is \( O(n^3) \))
+  - What is large?
+  - When \( n \) is around 10k, it starts to favor gradient descent, but for \( n = 10^6 \) definitely gradient descent
+
+Also, there is no "normal equation" method for more complex models -- is specific to linear regression
+
+*** Normal equation noninvertibility
+
+So \( θ = (X'X)^T X^T y \)
+
+- What if \( X'X \) is non-invertible?
+  - In Octave, this is never really a problem
+    - Two functions for inverse: =inv= and =pinv=
+    - The =pinv= (pseudo-inverse) does the right thing
+
+What makes \( X'X \) non-invertible?
+- Redundant features (linearly dependent)
+  - Delete the redundant features
+- Too many features (e.g., \( m ≤ n \))
+  - Delete some features, or use /regularization/, which we'll talk about later
+
+* Octave tutorial
+
+** Basic operations
+
+#+BEGIN_SRC octave
+  1 == 2                                  % false
+  1 ~= 2                                  % true
+  1 && 0                                  % AND
+  1 || 0                                  % OR
+  
+  a = 3                                   % Assignment
+  a = 3;                                  % Assignment suppresses output
+  a = pi;
+  disp(a);
+  disp(sprintf('2 decimals: %0.2f', a))   % 2 decimal places
+  disp(sprintf('2 decimals: %0.6f', a))   % 6 decimal places
+  format long                             % show more decimal places
+  format short                            % show fewer
+  
+                                          % Matrices
+  A = [1 2;
+       3 4;
+       5 6]
+  
+  v = [1 2 3]                             % Row vector
+  v = [1;
+       2;
+       3]                                 % Column vector
+  
+  v = 1:0.1:2
+  v = 1:6
+  
+                                          % Other ways to generate
+  w = ones(2,3)                           % 2x3 matrix of ones
+  w = zeros(1,3)                          % 1x3 matrix of zeros
+  w = rand(1,3)                           % 1x3 matrix of uniform random variables on [0,1]
+  w = randn(1,3)                          % standard normal random variables
+  w = -6 + sqrt(10)*(randn(1,10000))
+  hist(w)                                 % histogram of w
+  hist(w, 50)                             % hist with 50 bins
+  eye(4)                                  % identity matrix
+  help eye                                % brings up help for function eye
+#+END_SRC
+
+** Moving data around
+
+#+BEGIN_SRC octave
+  A = [1 2;
+       3 4;
+       5 6]
+  size(A) % returns 2-element matrix of dimensions
+  size(A,1) % number rows
+  v = [1 2 3 4]
+  length(A) % gives longest dim, usually only vectors
+  
+  %% Loading data
+  
+  pwd % present working directory
+  cd % change directory
+  ls % list files in current dir
+  
+  %% Suppose we have files 'featuresX.dat' and 'priceY.dat'
+  
+  load('featuresX.dat') % single quotes for strings
+  load('priceY.dat')
+  
+  who % shows variables in memory
+  % contains featuresX and priceY
+  
+  whos % gives detailed view with size, bytes, class
+  
+  clear featuresX % removes variable
+  
+  v = priceY(1:10) % sets v to 1st 10 elements
+  save hello.mat v; % saves v to 'hello.mat'
+  
+  clear % clears all variables
+  
+  save hello.txt v -ascii % saves as human-readable
+  
+  A(3,2) % accesses 3rd row, 2nd column
+  A(2,:) % all elements in 2nd row
+  A(:,2) % all elements in 2nd column
+  
+  A([1 3],:) % everything from rows 1 and 3
+  
+  A(:,2) = [10;
+            11;
+            12] % Assigns 2nd column of A
+  A = [A, [100;
+           101;
+           102]] % Appends column vector
+  
+  A(:) % put all elements of A into a single vector
+  
+  A = [1 2;
+       3 4;
+       5 6]
+  B = [11 12;
+       13 14;
+       15 16]
+  
+  C = [A B] % puts together horizontally
+  C = [A;
+       B] % stacks A and B
+#+END_SRC
+
+** Computing on data
+
+#+BEGIN_SRC octave
+  A = [1 2;
+       3 4;
+       5 6]
+  B = [11 12;
+       13 14;
+       15 16]
+  C = [1 1;
+       2 2]
+  
+  A*C                             % matrix mult
+  A .* B                          % element-wise multiplication
+  A .^ 2                          % element-wise squaring
+  
+  v = [1;
+       2;
+       3]
+  
+  1 ./ v                          % element-wise inverse
+  log(v)                          % element-wise log
+  exp(v)                          % element-wise exponentiation
+  abs(x)
+  -v
+  
+  v + ones(length(v), 1)          % increment all values
+  v + 1                           % same thing
+  
+  A'                              % transpose of A
+  (A')'                           % gives A back
+  a = [1 15 2 0.5]
+  max(a)                          % max of a
+  [val, ind] = max(a)             % vals and indices of max
+  max(A)                          % column-wise max
+  a < 3                           % element-wise comparison
+  A = magic(3)                    % 3x3 magic squares
+  [r,c] = find(A >= 7)            % finds elements of A satisfying condition
+  sum(a)                          % sum of elements of a
+  prod(a)
+  floor(a)                        % rounding
+  ceil(a)
+  
+  max(rand(3), rand(3))           % element-wise max
+  max(A,[],1)                     % column-wise max (default)
+  max(A,[],2)                     % per-row max
+  max(max(A))                     % largest in A
+  max(A(:))                       % same
+  
+  A = magic(9)
+  sum(A,1)                        % sums columns
+  sum(A,2)                        % sums columns
+  sum(sum(A .* eye(9)))           % sums main diag
+  sum(sum(A .* flipud(eye(9))))   % sums opposite diagonal
+  
+  A = magic(3)
+  temp = pinv(A)                  % pseudo-inverse A
+  temp * A                        % gives back identity
+#+END_SRC
+
+** Plotting data
+
+#+BEGIN_SRC octave
+  t = [0:0.01:0.98];
+  y1 = sin(2*pi*4*t);
+  plot(t,y1);
+  y2 = cos(2*pi*4*t);
+  plot(t,y2);
+  plot(t,y1);
+  hold on;                                % plots new figures on old ones
+  plot(t, y2, 'r');                       % add plot in red color
+  xlabel('time')
+  ylabel('value')
+  legend('sin', 'cos')
+  title('my plot')
+  print -dpng 'myPlot.png'                % saves the plot
+  close                                   % disappears existing figure
+  figure(1);
+  plot(t, y1);
+  figure(2);
+  plot(t, y2);                            % produces 2 figures
+  subplot(1,2,1)                          % divides plot into 1x2 grid, access first element
+  plot(t, y1);
+  subplot(1,2,2);
+  plot(t, y2);
+  axis([0.5 1 -1 1])                      % sets axis limits
+  
+  clf;                                    % clears figure
+  A = magic(5);
+  imagesc(A);                             % shows matrix as colors
+  imagesc(A), colorbar, colormap gray;    % adds colorbar and sets grays
+  imagesc(magic(15)), colorbar, colormap gray;
+  
+  a=1, b=2, c=3                           % chains commands; "comma-chaining"
+#+END_SRC
+
+** Control statements and functions
+
+#+BEGIN_SRC octave
+  v = zeros(10,1)
+  for i = 1:10,
+    v(i) = 2^i;
+  end;
+  v
+  
+  indices=1:10;
+  for i = indices,
+    disp(i);
+  end;
+  
+  i = 1;
+  while i <= 5,
+    v(i) = 100;
+    i = 1+1;
+  end;
+  
+  i = 1;
+  while true,
+    v(i) = 999;
+    i = i+1;
+    if i == 6,
+      break;
+    end;
+  end;
+  
+  v(1) = 2;
+  
+  if v(1)==1,
+    disp('The value is one');
+  elseif v(1) == 2,
+    disp('The value is two');
+  else
+    disp('The value is not one or two');
+  end;
+#+END_SRC
+
+Defining functions.
+
+Octave uses files with =.m= extension
+
+#+BEGIN_SRC octave
+  function y = squareThisNumber(x)
+    % will return one var y, is a function of one var x
+           
+    y = x^2;
+#+END_SRC
+
+Search path
+
+#+BEGIN_SRC octave
+  addpath('/path/to/functions') % adds dir to search path
+#+END_SRC
+
+Multiple return values:
+
+#+BEGIN_SRC octave
+  function [y1, y2] = squareAndCubeThisNumber(x)
+    y1 = x^2;
+    y2 = x^3;
+#+END_SRC
+
+Octave function to compute cost function
+
+#+BEGIN_SRC octave
+  X = [1 1;
+       1 2;
+       1 3];
+  y = [1;
+       2;
+       3]
+  
+  theta=[0;
+         1];
+  
+  j = costFunctionJ(x,y,theta)
+#+END_SRC
+
+#+BEGIN_SRC octave
+  function J = costFunctionJ(X, y, theta)
+  
+           % X is design matrix
+           % y is class labels
+  
+    m = size(X,1); % number training examples
+    predictions = X*theta; % predictions on examples given theta
+  
+    sqrErrors = (predictions-y).^2;
+    J = 1/(2*m) * sum(sqrErrors);
+#+END_SRC
+
+** Vectorization
+
+Do things with nice linear algebra libraries -- it goes faster, and is easier.
+
+- Don't write loops, use functions that work on vectors
+- For instance, dot product better than looping and summing
+
+Example in C++
+
+#+BEGIN_SRC c++
+  double prediction = theta.transpose() * x;
+#+END_SRC
+
+Gradient descent example
+
+#+BEGIN_SRC octave
+  delta = (1/m) *  X' * ( h(X) - y )
+  theta = theta - alpha * delta
+#+END_SRC
+
+* Logistic regression
+
+** Advanced optimization
+
+Given \( θ \), we want to compute two quantities
+1. \( J(θ) \)
+2. partial derivatives \( \frac{ \partial }{ \partial θ _{j} } J(θ) \) for \( j = 0, 1, \ldots \)
+
+Optimization algorithms:
+- Gradient descent
+- Conjugate gradient
+- BFGS
+- L-BFGS
+
+Advantages of the last 3:
+- No need to manually pick \( α \)
+  - Have an internal line search that automatically picks the learning rate
+- Often faster than gradient descent
+  - Make other optimizations that make them converge faster
+
+Disadvantages:
+- More complex
+  - Shouldn't implement yourself, use a library written by somebody very good with numerical computing
+- There is a significant difference between good and bad implementations
+
+*** Example
+
+- \( θ = (θ_1 θ_2) \)
+- \( J(θ) = (θ_1 - 5)^2 + (θ_2 - 5)^2 \)
+
+To implement this, we'll create a function that returns both the *cost value* and the *gradient value* for a given theta
+
+#+BEGIN_SRC octave
+  function [jVal, gradient] = costFunction(theta)
+  
+    jVal = (theta(1)-5)^2 + (theta(2)-5)^2;
+    gradient = zeros(2,1);
+    gradient(1) = 2*(theta(1)-5);
+    gradient(2) = 2*(theta(2)-5);
+#+END_SRC
+
+Then pass the function to the optimization routine =fminunc= (function min unconstrained)
+
+#+BEGIN_SRC octave
+  options = optimset('GradObj', 'on', 'MaxIter', '100');
+  # GradOpj tells octave to use the gradient returned
+  initialTheta = zeros(2,1);
+  [optTheta, functionVal, exitFlag] = fminunc(@costFunction, initialTheta, options);
+  # optTheta holds optimized
+  # functionVal is the function value
+  # exitFlag gives info
+#+END_SRC
+
+- The =@costFunction= parameter sends a pointer to the function =costFunction=
+- =fminunc= requires >2d; use something else for line search
+
+** Multiclass classification
+
+Examples:
+- Email foldering/tagging: home, friends, work
+- Medical diagrams: not ill, cold, flu
+- Weather: sunny, cloudy, rain, snow
+
+We can use logistic regression using "one-vs-all" or "one-vs-rest":
+
+- Create new training sets with binary membership for each group
+- We fit \( h _{θ} ^{k} (x) \) that estimates probability that each member is a member of class \( k \), so for 3 classes we get 3 classifiers
+- On a new input \( x \), to make a prediction we pick the class \( k \) that maximizes \( h _{θ} ^{k} (x) \)
